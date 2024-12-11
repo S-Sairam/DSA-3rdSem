@@ -1,5 +1,5 @@
 
-// dont rever the infix expression to get the postfix expression
+// reverse the final expression for postfix
 
 #include <stdio.h>
 #include <stdlib.h>
