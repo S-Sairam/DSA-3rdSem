@@ -1,6 +1,4 @@
 
-// reverse the final expression for postfix
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
