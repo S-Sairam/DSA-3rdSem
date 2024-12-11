@@ -1,3 +1,5 @@
+//for array implimentation pass i starting with 0 and recursively call i as index 2r+1 for left and 2r+2 for right
+
 int height(struct Node* root) {   // height is also same as maximum depth
     if (root == NULL) {
         return 0;
