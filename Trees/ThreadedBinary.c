@@ -9,81 +9,92 @@ typedef struct node {
     int rightThread;  // Flag to indicate if right pointer is a thread
 } NODE;
 
-// Function to find leftmost node
-NODE* leftMost(NODE* node) {
-    if (node == NULL)
-        return NULL;
+// Create a new node
+NODE* createNode(int key) {
+    NODE* newNode = (NODE*)malloc(sizeof(NODE));
+    newNode->data = key;
+    newNode->left = newNode->right = NULL;
+    newNode->leftThread = newNode->rightThread = 1;
+    return newNode;
+}
+
+// Recursive insertion
+NODE* insertRecursive(NODE* root, int key) {
+    // If tree is empty, create root
+    if (root == NULL)
+        return createNode(key);
     
-    while (node->leftThread == 0)
-        node = node->left;
+    // Insert into left subtree
+    if (key < root->data) {
+        if (root->leftThread)
+            // Create new left child
+            root->left = createNode(key);
+        else
+            // Recursively insert in left subtree
+            root->left = insertRecursive(root->left, key);
+        
+        // Update threading
+        root->leftThread = 0;
+    }
+    // Insert into right subtree
+    else {
+        if (root->rightThread)
+            // Create new right child
+            root->right = createNode(key);
+        else
+            // Recursively insert in right subtree
+            root->right = insertRecursive(root->right, key);
+        
+        // Update threading
+        root->rightThread = 0;
+    }
+    
+    return root;
+}
+
+// Recursive inorder traversal
+void inorderTraversalRecursive(NODE* root) {
+    if (root == NULL)
+        return;
+    
+    // Traverse left subtree if not a thread
+    if (!root->leftThread)
+        inorderTraversalRecursive(root->left);
+    
+    // Print current node
+    printf("%d ", root->data);
+    
+    // Traverse right subtree if not a thread
+    if (!root->rightThread)
+        inorderTraversalRecursive(root->right);
+}
+
+// Find predecessor (optional but useful)
+NODE* findPredecessor(NODE* node) {
+    // If left thread exists, it points to predecessor
+    if (node->leftThread)
+        return node->left;
+    
+    // Otherwise, find rightmost node in left subtree
+    node = node->left;
+    while (!node->rightThread)
+        node = node->right;
     
     return node;
 }
 
-// Inorder traversal
-void inorderTraversal(NODE* root) {
-    NODE* current = leftMost(root);
+// Find successor (optional but useful)
+NODE* findSuccessor(NODE* node) {
+    // If right thread exists, it points to successor
+    if (node->rightThread)
+        return node->right;
     
-    while (current != NULL) {
-        printf("%d ", current->data);
-        
-        // If right is a thread, move to thread
-        if (current->rightThread)
-            current = current->right;
-        else
-            // Otherwise, find leftmost of right subtree
-            current = leftMost(current->right);
-    }
-}
-
-// Insert into Threaded Binary Search Tree
-NODE* insert(NODE* root, int key) {
-    NODE* current = root;
-    NODE* parent = NULL;
+    // Otherwise, find leftmost node in right subtree
+    node = node->right;
+    while (!node->leftThread)
+        node = node->left;
     
-    // Find appropriate insertion point
-    while (current != NULL) {
-        parent = current;
-        
-        if (key < current->data) {
-            if (current->leftThread == 0)
-                current = current->left;
-            else
-                break;
-        } else {
-            if (current->rightThread == 0)
-                current = current->right;
-            else
-                break;
-        }
-    }
-    
-    // Create new node
-    NODE* newNode = (NODE*)malloc(sizeof(NODE));
-    newNode->data = key;
-    
-    // Handle insertion
-    if (parent == NULL) {
-        root = newNode;
-        newNode->left = newNode->right = NULL;
-        newNode->leftThread = newNode->rightThread = 1;
-    } else if (key < parent->data) {
-        // Left insertion
-        newNode->left = parent->left;
-        newNode->right = parent;
-        parent->leftThread = 0;
-        parent->left = newNode;
-        newNode->leftThread = newNode->rightThread = 1;
-    } else {
-        // Right insertion
-        newNode->right = parent->right;
-        newNode->left = parent;
-        parent->rightThread = 0;
-        parent->right = newNode;
-        newNode->leftThread = newNode->rightThread = 1;
-    }
-    
-    return root;
+    return node;
 }
 
 // Main function for demonstration
@@ -91,15 +102,18 @@ int main() {
     NODE* root = NULL;
     
     // Insert some values
-    root = insert(root, 20);
-    root = insert(root, 10);
-    root = insert(root, 30);
-    root = insert(root, 5);
-    root = insert(root, 15);
+    root = insertRecursive(root, 50);
+    root = insertRecursive(root, 30);
+    root = insertRecursive(root, 70);
+    root = insertRecursive(root, 20);
+    root = insertRecursive(root, 40);
+    root = insertRecursive(root, 60);
+    root = insertRecursive(root, 80);
     
-    // Perform inorder traversal
-    printf("Inorder Traversal: ");
-    inorderTraversal(root);
+    // Perform recursive inorder traversal
+    printf("Recursive Inorder Traversal: ");
+    inorderTraversalRecursive(root);
+    printf("\n");
     
     return 0;
 }
