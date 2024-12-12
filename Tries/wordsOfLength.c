@@ -1,53 +1,25 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-
-#define MAX_CHARS 256
-
-typedef struct trienode {
-    struct trienode* letters[MAX_CHARS];
-    bool terminal;
-} NODE;
-
-// Function prototypes
-void printWordsOfLengthRec(NODE* node, unsigned char* buffer, int currentLength, int targetLength);
-void printWordsOfLength(NODE* root, int targetLength);
-
-// Recursive function to print words of a specific length
-void printWordsOfLengthRec(NODE* node, unsigned char* buffer, int currentLength, int targetLength) {
-    if (node == NULL) {
+void display_of_length(TRIE *root, char *str, int level, int length) {
+    // Base case: if current node is NULL, return
+    if (root == NULL)
         return;
+    
+    // If we've reached the desired length and this is a valid word (leaf node)
+    if (level == length && root->isLeaf) {
+        // Null-terminate the string at current level
+        str[level] = '\0';
+        // Print the word
+        printf("%s\n", str);
     }
-
-    // If the word reaches the target length and is terminal, print it
-    if (currentLength == targetLength && node->terminal) {
-        buffer[currentLength] = '\0'; // Null-terminate the word
-        printf("WORD: %s\n", buffer);
-        return;
-    }
-
-    // If the current length exceeds the target length, stop the traversal
-    if (currentLength >= targetLength) {
-        return;
-    }
-
-    // Recurse for all possible letters
-    for (int i = 0; i < MAX_CHARS; i++) {
-        if (node->letters[i] != NULL) {
-            buffer[currentLength] = i; // Add the character to the buffer
-            printWordsOfLengthRec(node->letters[i], buffer, currentLength + 1, targetLength);
+    
+    // Explore all possible child nodes (26 lowercase letters)
+    for (int i = 0; i < 26; i++) {
+        // If child exists
+        if (root->child[i] != NULL) {
+            // Add current character to string
+            str[level] = i + 'a';
+            
+            // Recursively explore this path
+            display_of_length(root->child[i], str, level + 1, length);
         }
     }
-}
-
-// Wrapper function to print words of a specific length
-void printWordsOfLength(NODE* root, int targetLength) {
-    if (root == NULL) {
-        printf("TRIE IS EMPTY\n");
-        return;
-    }
-
-    unsigned char buffer[targetLength + 1]; // Buffer to store the word being formed
-    printWordsOfLengthRec(root, buffer, 0, targetLength);
 }
